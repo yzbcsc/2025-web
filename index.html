@@ -267,6 +267,31 @@
             margin: 10px 0;
             font-size: 0.9rem;
         }
+        .library-management {
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .library-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .word-count {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        .edit-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .edit-area textarea {
+            min-height: 200px;
+        }
     </style>
 </head>
 <body>
@@ -307,13 +332,33 @@
                 <select id="word-library">
                     <option value="custom">自定义词库</option>
                     <option value="default">默认小学词库</option>
+                    <option value="extended">扩展词库</option>
                 </select>
                 
                 <div id="custom-library-container">
-                    <label>输入自定义单词（每行一个单词，格式：单词,意思,例句,例句翻译）：</label>
-                    <textarea id="custom-library" rows="6" placeholder="apple,苹果,I eat an apple every day.,我每天吃一个苹果。
-library,图书馆,We read books in the library.,我们在图书馆看书。"></textarea>
-                    <button id="save-library-btn">保存词库</button>
+                    <div class="word-count">当前词库: <span id="word-count">0</span> 个单词</div>
+                    <textarea id="custom-library" rows="6" placeholder="每行一个单词，格式：单词,意思,例句,例句翻译"></textarea>
+                    <div class="library-actions">
+                        <button id="save-library-btn">保存词库</button>
+                        <button id="clear-library-btn">清空词库</button>
+                    </div>
+                </div>
+                
+                <div class="library-management">
+                    <h3>词库管理</h3>
+                    <div class="edit-area">
+                        <div>
+                            <label>英语单词 (每行一个)</label>
+                            <textarea id="english-words" placeholder="输入英语单词，每行一个"></textarea>
+                        </div>
+                        <div>
+                            <label>中文翻译 (每行一个)</label>
+                            <textarea id="chinese-translations" placeholder="输入中文翻译，每行一个"></textarea>
+                        </div>
+                    </div>
+                    <button id="add-words-btn">添加到词库</button>
+                    <button id="import-library-btn">导入词库</button>
+                    <button id="export-library-btn">导出词库</button>
                 </div>
             </div>
         </div>
@@ -387,6 +432,209 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             {word: "jump", meaning: "跳", example: "I can jump high.", exampleMeaning: "我能跳得很高"}
         ];
 
+        // 扩展词库（根据用户提供的单词列表）
+        const extendedLibrary = [
+            {word: "word", meaning: "文字、单词", example: "", exampleMeaning: ""},
+            {word: "light", meaning: "灯", example: "", exampleMeaning: ""},
+            {word: "door", meaning: "门", example: "", exampleMeaning: ""},
+            {word: "window", meaning: "窗户", example: "", exampleMeaning: ""},
+            {word: "radio", meaning: "收音机", example: "", exampleMeaning: ""},
+            {word: "ruler", meaning: "尺子", example: "", exampleMeaning: ""},
+            {word: "crayon", meaning: "蜡笔", example: "", exampleMeaning: ""},
+            {word: "marker", meaning: "标记", example: "", exampleMeaning: ""},
+            {word: "computer", meaning: "电脑", example: "", exampleMeaning: ""},
+            {word: "glass", meaning: "水杯", example: "", exampleMeaning: ""},
+            {word: "water", meaning: "水", example: "", exampleMeaning: ""},
+            {word: "shoes", meaning: "鞋", example: "", exampleMeaning: ""},
+            {word: "slippers", meaning: "拖鞋", example: "", exampleMeaning: ""},
+            {word: "boots", meaning: "靴子", example: "", exampleMeaning: ""},
+            {word: "yellow cap", meaning: "黄色的帽子", example: "", exampleMeaning: ""},
+            {word: "shorts", meaning: "短裤", example: "", exampleMeaning: ""},
+            {word: "overcoat", meaning: "大衣", example: "", exampleMeaning: ""},
+            {word: "sneakers", meaning: "运动鞋", example: "", exampleMeaning: ""},
+            {word: "sandals", meaning: "凉鞋", example: "", exampleMeaning: ""},
+            {word: "trousers", meaning: "裤子", example: "", exampleMeaning: ""},
+            {word: "jacket", meaning: "夹克衫", example: "", exampleMeaning: ""},
+            {word: "bag", meaning: "包", example: "", exampleMeaning: ""},
+            {word: "bus", meaning: "公共汽车", example: "", exampleMeaning: ""},
+            {word: "juice", meaning: "果汁", example: "", exampleMeaning: ""},
+            {word: "milk", meaning: "牛奶", example: "", exampleMeaning: ""},
+            {word: "a glass of", meaning: "一杯", example: "", exampleMeaning: ""},
+            {word: "soup", meaning: "汤", example: "", exampleMeaning: ""},
+            {word: "fish", meaning: "鱼肉", example: "", exampleMeaning: ""},
+            {word: "pizza", meaning: "披萨", example: "", exampleMeaning: ""},
+            {word: "chips", meaning: "炸薯条", example: "", exampleMeaning: ""},
+            {word: "sandwich", meaning: "三明治", example: "", exampleMeaning: ""},
+            {word: "money", meaning: "钱", example: "", exampleMeaning: ""},
+            {word: "change", meaning: "零钱", example: "", exampleMeaning: ""},
+            {word: "ice", meaning: "冰", example: "", exampleMeaning: ""},
+            {word: "book", meaning: "书", example: "", exampleMeaning: ""},
+            {word: "pen", meaning: "钢笔", example: "", exampleMeaning: ""},
+            {word: "shoe", meaning: "鞋", example: "", exampleMeaning: ""},
+            {word: "shop", meaning: "商店", example: "", exampleMeaning: ""},
+            {word: "duck", meaning: "鸭子", example: "", exampleMeaning: ""},
+            {word: "dog", meaning: "狗", example: "", exampleMeaning: ""},
+            {word: "cat", meaning: "猫", example: "", exampleMeaning: ""},
+            {word: "open", meaning: "打开", example: "", exampleMeaning: ""},
+            {word: "close", meaning: "关闭", example: "", exampleMeaning: ""},
+            {word: "hold", meaning: "拿", example: "", exampleMeaning: ""},
+            {word: "borrow", meaning: "借用", example: "", exampleMeaning: ""},
+            {word: "take", meaning: "用,拿到", example: "", exampleMeaning: ""},
+            {word: "sell", meaning: "卖", example: "", exampleMeaning: ""},
+            {word: "buy", meaning: "买", example: "", exampleMeaning: ""},
+            {word: "order", meaning: "点餐", example: "", exampleMeaning: ""},
+            {word: "cook", meaning: "厨师", example: "", exampleMeaning: ""},
+            {word: "fly", meaning: "飞", example: "", exampleMeaning: ""},
+            {word: "grow", meaning: "生长", example: "", exampleMeaning: ""},
+            {word: "live", meaning: "居住,生存", example: "", exampleMeaning: ""},
+            {word: "visit", meaning: "拜访", example: "", exampleMeaning: ""},
+            {word: "mind", meaning: "介意", example: "", exampleMeaning: ""},
+            {word: "clever", meaning: "聪明的", example: "", exampleMeaning: ""},
+            {word: "feeling", meaning: "感受", example: "", exampleMeaning: ""},
+            {word: "kind", meaning: "善良的,种类", example: "", exampleMeaning: ""},
+            {word: "think", meaning: "认为", example: "", exampleMeaning: ""},
+            {word: "sweet", meaning: "甜的", example: "", exampleMeaning: ""},
+            {word: "sour", meaning: "酸的", example: "", exampleMeaning: ""},
+            {word: "hot", meaning: "热的", example: "", exampleMeaning: ""},
+            {word: "rain", meaning: "下雨", example: "", exampleMeaning: ""},
+            {word: "raining", meaning: "雨", example: "", exampleMeaning: ""},
+            {word: "snow", meaning: "雪", example: "", exampleMeaning: ""},
+            {word: "snowing", meaning: "下雪", example: "", exampleMeaning: ""},
+            {word: "weather", meaning: "天气", example: "", exampleMeaning: ""},
+            {word: "farm", meaning: "农场", example: "", exampleMeaning: ""},
+            {word: "lake", meaning: "湖", example: "", exampleMeaning: ""},
+            {word: "park", meaning: "公园", example: "", exampleMeaning: ""},
+            {word: "forest", meaning: "森林", example: "", exampleMeaning: ""},
+            {word: "nature", meaning: "大自然", example: "", exampleMeaning: ""},
+            {word: "air", meaning: "空气", example: "", exampleMeaning: ""},
+            {word: "season", meaning: "季节", example: "", exampleMeaning: ""},
+            {word: "place", meaning: "地点", example: "", exampleMeaning: ""},
+            {word: "colour", meaning: "颜色", example: "", exampleMeaning: ""},
+            {word: "shape", meaning: "形状", example: "", exampleMeaning: ""},
+            {word: "red", meaning: "红色", example: "", exampleMeaning: ""},
+            {word: "green", meaning: "绿色", example: "", exampleMeaning: ""},
+            {word: "brown", meaning: "棕色", example: "", exampleMeaning: ""},
+            {word: "black", meaning: "黑色", example: "", exampleMeaning: ""},
+            {word: "white", meaning: "白色", example: "", exampleMeaning: ""},
+            {word: "favour", meaning: "帮忙", example: "", exampleMeaning: ""},
+            {word: "pair", meaning: "双", example: "", exampleMeaning: ""},
+            {word: "this", meaning: "这个", example: "", exampleMeaning: ""},
+            {word: "that", meaning: "那个", example: "", exampleMeaning: ""},
+            {word: "these", meaning: "这些", example: "", exampleMeaning: ""},
+            {word: "those", meaning: "那些", example: "", exampleMeaning: ""},
+            {word: "which", meaning: "哪一个", example: "", exampleMeaning: ""},
+            {word: "big", meaning: "大的", example: "", exampleMeaning: ""},
+            {word: "without", meaning: "没有", example: "", exampleMeaning: ""},
+            {word: "food", meaning: "食物", example: "", exampleMeaning: ""},
+            {word: "week", meaning: "星期", example: "", exampleMeaning: ""},
+            {word: "month", meaning: "月", example: "", exampleMeaning: ""},
+            {word: "clothes", meaning: "服装", example: "", exampleMeaning: ""},
+            {word: "subject", meaning: "科目", example: "", exampleMeaning: ""},
+            {word: "farmer", meaning: "农民", example: "", exampleMeaning: ""},
+            {word: "teacher", meaning: "老师", example: "", exampleMeaning: ""},
+            {word: "doctor", meaning: "医生", example: "", exampleMeaning: ""},
+            {word: "pilot", meaning: "飞行员", example: "", exampleMeaning: ""},
+            {word: "barber", meaning: "理发师", example: "", exampleMeaning: ""},
+            {word: "music", meaning: "音乐", example: "", exampleMeaning: ""},
+            {word: "like...best", meaning: "最喜欢", example: "", exampleMeaning: ""},
+            {word: "song", meaning: "歌曲", example: "", exampleMeaning: ""},
+            {word: "make model planes", meaning: "制作飞机模型", example: "", exampleMeaning: ""},
+            {word: "after school", meaning: "放学后", example: "", exampleMeaning: ""},
+            {word: "after work", meaning: "下班后", example: "", exampleMeaning: ""},
+            {word: "noisy", meaning: "吵闹的", example: "", exampleMeaning: ""},
+            {word: "quiet", meaning: "安静的", example: "", exampleMeaning: ""},
+            {word: "tutle", meaning: "乌龟", example: "", exampleMeaning: ""},
+            {word: "fever", meaning: "发烧", example: "", exampleMeaning: ""},
+            {word: "need", meaning: "需要", example: "", exampleMeaning: ""},
+            {word: "headache", meaning: "头痛", example: "", exampleMeaning: ""},
+            {word: "feel", meaning: "感受到", example: "", exampleMeaning: ""},
+            {word: "wrong", meaning: "有毛病的、有问题的", example: "", exampleMeaning: ""},
+            {word: "the flu", meaning: "流感", example: "", exampleMeaning: ""},
+            {word: "a coungh", meaning: "咳嗽", example: "", exampleMeaning: ""},
+            {word: "pill", meaning: "药", example: "", exampleMeaning: ""},
+            {word: "mouth", meaning: "嘴", example: "", exampleMeaning: ""},
+            {word: "a sore throat", meaning: "嗓子痛", example: "", exampleMeaning: ""},
+            {word: "has", meaning: "有", example: "", exampleMeaning: ""},
+            {word: "have", meaning: "有", example: "", exampleMeaning: ""},
+            {word: "high", meaning: "高的", example: "", exampleMeaning: ""},
+            {word: "bad", meaning: "严重的", example: "", exampleMeaning: ""},
+            {word: "matter", meaning: "事情 问题", example: "", exampleMeaning: ""},
+            {word: "hurt", meaning: "受伤 疼痛", example: "", exampleMeaning: ""},
+            {word: "walk", meaning: "走路", example: "", exampleMeaning: ""},
+            {word: "knee", meaning: "膝盖", example: "", exampleMeaning: ""},
+            {word: "leg", meaning: "腿", example: "", exampleMeaning: ""},
+            {word: "right", meaning: "右", example: "", exampleMeaning: ""},
+            {word: "left", meaning: "左", example: "", exampleMeaning: ""},
+            {word: "arm", meaning: "胳膊", example: "", exampleMeaning: ""},
+            {word: "finger", meaning: "手指", example: "", exampleMeaning: ""},
+            {word: "my his her", meaning: "", example: "", exampleMeaning: ""},
+            {word: "fifth", meaning: "第五", example: "", exampleMeaning: ""},
+            {word: "library", meaning: "图书馆", example: "", exampleMeaning: ""},
+            {word: "stair", meaning: "楼梯", example: "", exampleMeaning: ""},
+            {word: "floor", meaning: "层", example: "", exampleMeaning: ""},
+            {word: "fourth", meaning: "第四", example: "", exampleMeaning: ""},
+            {word: "beside", meaning: "在……旁边", example: "", exampleMeaning: ""},
+            {word: "behind", meaning: "在……后面", example: "", exampleMeaning: ""},
+            {word: "find", meaning: "找到 发现", example: "", exampleMeaning: ""},
+            {word: "right beside", meaning: "正好在……旁边", example: "", exampleMeaning: ""},
+            {word: "grey", meaning: "灰色", example: "", exampleMeaning: ""},
+            {word: "drive", meaning: "开车", example: "", exampleMeaning: ""},
+            {word: "corner", meaning: "路口", example: "", exampleMeaning: ""},
+            {word: "first", meaning: "第1", example: "", exampleMeaning: ""},
+            {word: "second", meaning: "第2", example: "", exampleMeaning: ""},
+            {word: "third", meaning: "第3", example: "", exampleMeaning: ""},
+            {word: "fourth", meaning: "第4", example: "", exampleMeaning: ""},
+            {word: "fifth", meaning: "第5", example: "", exampleMeaning: ""},
+            {word: "sixth", meaning: "第6", example: "", exampleMeaning: ""},
+            {word: "seventh", meaning: "第7", example: "", exampleMeaning: ""},
+            {word: "eighth", meaning: "第8", example: "", exampleMeaning: ""},
+            {word: "ninth", meaning: "第9", example: "", exampleMeaning: ""},
+            {word: "tenth", meaning: "第10", example: "", exampleMeaning: ""},
+            {word: "cat", meaning: "猫", example: "", exampleMeaning: ""},
+            {word: "dog", meaning: "狗", example: "", exampleMeaning: ""},
+            {word: "pig", meaning: "猪", example: "", exampleMeaning: ""},
+            {word: "duck", meaning: "鸭", example: "", exampleMeaning: ""},
+            {word: "duckling", meaning: "小鸭子", example: "", exampleMeaning: ""},
+            {word: "rabbit", meaning: "兔子", example: "", exampleMeaning: ""},
+            {word: "horse", meaning: "马", example: "", exampleMeaning: ""},
+            {word: "elephant", meaning: "大象", example: "", exampleMeaning: ""},
+            {word: "ant", meaning: "蚂蚁", example: "", exampleMeaning: ""},
+            {word: "fish", meaning: "鱼", example: "", exampleMeaning: ""},
+            {word: "bird", meaning: "鸟", example: "", exampleMeaning: ""},
+            {word: "snake", meaning: "蛇", example: "", exampleMeaning: ""},
+            {word: "mouse", meaning: "鼠", example: "", exampleMeaning: ""},
+            {word: "monkey", meaning: "猴子", example: "", exampleMeaning: ""},
+            {word: "panda", meaning: "熊猫", example: "", exampleMeaning: ""},
+            {word: "bear", meaning: "熊", example: "", exampleMeaning: ""},
+            {word: "lion", meaning: "狮", example: "", exampleMeaning: ""},
+            {word: "tiger", meaning: "老虎", example: "", exampleMeaning: ""},
+            {word: "fox", meaning: "狐狸", example: "", exampleMeaning: ""},
+            {word: "zebra", meaning: "斑马", example: "", exampleMeaning: ""},
+            {word: "deer", meaning: "鹿", example: "", exampleMeaning: ""},
+            {word: "sheep", meaning: "绵羊", example: "", exampleMeaning: ""},
+            {word: "goat", meaning: "山羊", example: "", exampleMeaning: ""},
+            {word: "cow", meaning: "奶牛", example: "", exampleMeaning: ""},
+            {word: "shark", meaning: "鲨鱼", example: "", exampleMeaning: ""},
+            {word: "parrot", meaning: "鹦鹉", example: "", exampleMeaning: ""},
+            {word: "hamster", meaning: "仓鼠", example: "", exampleMeaning: ""},
+            {word: "goldfish", meaning: "金鱼", example: "", exampleMeaning: ""},
+            {word: "turtle", meaning: "乌龟", example: "", exampleMeaning: ""},
+            {word: "foot", meaning: "脚", example: "", exampleMeaning: ""},
+            {word: "head", meaning: "头", example: "", exampleMeaning: ""},
+            {word: "face", meaning: "脸", example: "", exampleMeaning: ""},
+            {word: "hair", meaning: "头发", example: "", exampleMeaning: ""},
+            {word: "nose", meaning: "鼻子", example: "", exampleMeaning: ""},
+            {word: "mouth", meaning: "嘴", example: "", exampleMeaning: ""},
+            {word: "eye", meaning: "眼睛", example: "", exampleMeaning: ""},
+            {word: "ear", meaning: "耳朵", example: "", exampleMeaning: ""},
+            {word: "arm", meaning: "手臂", example: "", exampleMeaning: ""},
+            {word: "hand", meaning: "手", example: "", exampleMeaning: ""},
+            {word: "finger", meaning: "手指", example: "", exampleMeaning: ""},
+            {word: "leg", meaning: "腿", example: "", exampleMeaning: ""},
+            {word: "tail", meaning: "尾巴", example: "", exampleMeaning: ""},
+            {word: "throat", meaning: "喉咙", example: "", exampleMeaning: ""}
+        ];
+
         // 应用状态
         const state = {
             allWords: [],
@@ -449,6 +697,7 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             customLibraryContainer: document.getElementById('custom-library-container'),
             customLibraryInput: document.getElementById('custom-library'),
             saveLibraryBtn: document.getElementById('save-library-btn'),
+            clearLibraryBtn: document.getElementById('clear-library-btn'),
             newWordsCount: document.getElementById('new-words-count'),
             reviewWordsCount: document.getElementById('review-words-count'),
             learnModeBtn: document.getElementById('learn-mode-btn'),
@@ -459,7 +708,13 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             apkWarning: document.getElementById('apk-warning'),
             apkSolution: document.getElementById('apk-solution'),
             testVoiceBtn: document.getElementById('test-voice-btn'),
-            testResult: document.getElementById('test-result')
+            testResult: document.getElementById('test-result'),
+            englishWords: document.getElementById('english-words'),
+            chineseTranslations: document.getElementById('chinese-translations'),
+            addWordsBtn: document.getElementById('add-words-btn'),
+            importLibraryBtn: document.getElementById('import-library-btn'),
+            exportLibraryBtn: document.getElementById('export-library-btn'),
+            wordCount: document.getElementById('word-count')
         };
 
         // 检查APK环境
@@ -483,8 +738,9 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             let ttsSuccess = false;
             try {
                 if('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance("测试");
-                    utterance.lang = 'zh-CN';
+                    const utterance = new SpeechSynthesisUtterance("test");
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.8; // 更慢的语速
                     utterance.onend = function() {
                         ttsSuccess = true;
                         checkTestResult();
@@ -503,7 +759,7 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if(SpeechRecognition) {
                     const recognition = new SpeechRecognition();
-                    recognition.lang = 'zh-CN';
+                    recognition.lang = 'en-US';
                     recognition.onresult = function() {
                         asrSuccess = true;
                         checkTestResult();
@@ -568,7 +824,7 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             state.recognition.onresult = function(event) {
                 const transcript = event.results[0][0].transcript;
                 elements.dictationInput.value = transcript;
-                checkSpelling();
+                setTimeout(checkSpelling, 500); // 延迟检查，确保输入完成
             };
             
             state.recognition.onerror = function(event) {
@@ -669,16 +925,18 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             elements.reviewWordsPerDayInput.value = state.reviewWordsPerDay;
             elements.newWordsCount.textContent = state.newWordsPerDay;
             elements.reviewWordsCount.textContent = state.reviewWordsPerDay;
-            elements.wordLibrarySelect.value = 'custom';
+            elements.wordLibrarySelect.value = 'extended';
             
             const savedLibrary = localStorage.getItem('customWordLibrary');
             if(savedLibrary) {
                 elements.customLibraryInput.value = savedLibrary;
+                updateWordCount();
             } else {
                 let exampleText = defaultLibrary.map(word => 
                     `${word.word},${word.meaning},${word.example},${word.exampleMeaning}`
                 ).join('\n');
                 elements.customLibraryInput.value = exampleText;
+                updateWordCount();
             }
             
             const savedProgress = localStorage.getItem('learningProgress');
@@ -698,11 +956,15 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             elements.checkSpellingBtn.addEventListener('click', checkSpelling);
             elements.restartBtn.addEventListener('click', restartLearning);
             elements.saveLibraryBtn.addEventListener('click', saveCustomLibrary);
+            elements.clearLibraryBtn.addEventListener('click', clearCustomLibrary);
             elements.learnModeBtn.addEventListener('click', () => switchMode('learn'));
             elements.dictationModeBtn.addEventListener('click', () => switchMode('dictation'));
             elements.learnBackBtn.addEventListener('click', backToWelcome);
             elements.dictationBackBtn.addEventListener('click', backToWelcome);
             elements.wordLibrarySelect.addEventListener('change', toggleLibrarySelector);
+            elements.addWordsBtn.addEventListener('click', addWordsToLibrary);
+            elements.importLibraryBtn.addEventListener('click', importLibrary);
+            elements.exportLibraryBtn.addEventListener('click', exportLibrary);
             
             elements.dictationInput.addEventListener('keypress', (e) => {
                 if(e.key === 'Enter') {
@@ -712,6 +974,98 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             
             elements.newWordsPerDayInput.addEventListener('change', updateSettings);
             elements.reviewWordsPerDayInput.addEventListener('change', updateSettings);
+            elements.customLibraryInput.addEventListener('input', updateWordCount);
+        }
+
+        // 更新词库单词计数
+        function updateWordCount() {
+            const text = elements.customLibraryInput.value.trim();
+            const count = text ? text.split('\n').filter(line => line.trim()).length : 0;
+            elements.wordCount.textContent = count;
+        }
+
+        // 添加单词到词库
+        function addWordsToLibrary() {
+            const englishWords = elements.englishWords.value.trim().split('\n').filter(w => w.trim());
+            const chineseTranslations = elements.chineseTranslations.value.trim().split('\n').filter(w => w.trim());
+            
+            if(englishWords.length === 0 || chineseTranslations.length === 0) {
+                alert('请输入英语单词和中文翻译！');
+                return;
+            }
+            
+            if(englishWords.length !== chineseTranslations.length) {
+                alert('英语单词和中文翻译的行数必须相同！');
+                return;
+            }
+            
+            let newWords = [];
+            for(let i = 0; i < englishWords.length; i++) {
+                newWords.push(`${englishWords[i]},${chineseTranslations[i]},,`);
+            }
+            
+            const currentText = elements.customLibraryInput.value.trim();
+            if(currentText) {
+                elements.customLibraryInput.value = currentText + '\n' + newWords.join('\n');
+            } else {
+                elements.customLibraryInput.value = newWords.join('\n');
+            }
+            
+            updateWordCount();
+            elements.englishWords.value = '';
+            elements.chineseTranslations.value = '';
+            alert(`已添加 ${englishWords.length} 个单词到词库！`);
+        }
+
+        // 导入词库
+        function importLibrary() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.txt,.csv';
+            
+            fileInput.onchange = e => {
+                const file = e.target.files[0];
+                if(!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = event => {
+                    elements.customLibraryInput.value = event.target.result;
+                    updateWordCount();
+                    alert('词库导入成功！');
+                };
+                reader.readAsText(file);
+            };
+            
+            fileInput.click();
+        }
+
+        // 导出词库
+        function exportLibrary() {
+            const text = elements.customLibraryInput.value.trim();
+            if(!text) {
+                alert('当前词库为空，无法导出！');
+                return;
+            }
+            
+            const blob = new Blob([text], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '自定义词库.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 清空自定义词库
+        function clearCustomLibrary() {
+            if(confirm('确定要清空自定义词库吗？')) {
+                elements.customLibraryInput.value = '';
+                updateWordCount();
+                localStorage.removeItem('customWordLibrary');
+                alert('词库已清空！');
+            }
         }
 
         // 切换词库选择器
@@ -792,6 +1146,8 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             if(selectedLibrary === 'custom') {
                 const customText = elements.customLibraryInput.value.trim();
                 state.allWords = customText ? parseCustomLibrary(customText) : [...defaultLibrary];
+            } else if(selectedLibrary === 'extended') {
+                state.allWords = [...extendedLibrary];
             } else {
                 state.allWords = [...defaultLibrary];
             }
@@ -914,7 +1270,7 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
                         } else {
                             state.autoPlayTimeout = setTimeout(nextWord, 1500);
                         }
-                    }, 1200);
+                    }, 1500); // 增加延迟，让发音更清晰
                 }
             }
             
@@ -947,9 +1303,9 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
                             elements.dictationPlayStatus.textContent = "请拼写单词";
                             setTimeout(() => {
                                 elements.dictationInput.focus();
-                            }, 300);
+                            }, 500);
                         }
-                    }, 1200);
+                    }, 1500); // 增加延迟，让发音更清晰
                 }
             }
             
@@ -961,7 +1317,7 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
             speakWord(state.currentWord.word);
             setTimeout(() => {
                 speakMeaning(state.currentWord.meaning);
-            }, 1200);
+            }, 1500); // 增加延迟，让发音更清晰
         }
 
         // 朗读单词
@@ -971,7 +1327,7 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
                     speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = 'en-US';
-                    utterance.rate = 0.9;
+                    utterance.rate = 0.8; // 更慢的语速
                     speechSynthesis.speak(utterance);
                 } catch(e) {
                     console.error('语音合成错误:', e);
@@ -990,7 +1346,7 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
                 try {
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = 'zh-CN';
-                    utterance.rate = 0.9;
+                    utterance.rate = 0.8; // 更慢的语速
                     speechSynthesis.speak(utterance);
                 } catch(e) {
                     console.error('语音合成错误:', e);
@@ -1022,60 +1378,60 @@ library,图书馆,We read books in the library.,我们在图书馆看书。"></t
                     saveProgress();
                 }
                 
-                setTimeout(nextWord, 1500);
+                setTimeout(nextWord, 5000); // 延迟5秒进入下一个单词
             } else {
                 elements.dictationResult.textContent = '✗ 拼写错误';
                 elements.dictationResult.style.color = '#e74c3c';
                 
-                setTimeout(nextWord, 2000);
-            }
-        }
+                setTimeout(nextWord, 5000); // 延迟5秒进入下一个单词setTimeout(nextWord, 5000); // 延迟5秒进入下一个单词
+            }}
+        }}
 
-        // 更新进度条
-        function updateProgress() {
-            const percent = (state.progress / state.totalWords) * 100;
-            elements.progressBar.style.width = `${percent}%`;
-            elements.progressText.textContent = `${state.progress}/${state.totalWords}`;
-        }
+        // 更新进度条// 更新进度条
+        function updateProgress() {function updateProgress() {
+            const percent = (state.progress / state.totalWords) * 100;const percent = (state.progress / state.totalWords) * 100;
+            elements.progressBar.style.width = `${percent}%`;elements.progressBar.style.width = `${percent}%`;
+            elements.progressText.textContent = `${state.progress}/${state.totalWords}`;elements.progressText.textContent = `${state.progress}/${state.totalWords}`;
+        }}
 
-        // 完成学习
-        function completeLearning() {
-            saveProgress();
+        // 完成学习// 完成学习
+        function completeLearning() {function completeLearning() {
+            保存进度();saveProgress();
             
-            elements.newLearnedCount.textContent = state.newWordsPerDay - state.newWords.length;
-            elements.reviewedCount.textContent = state.reviewWordsPerDay - state.reviewWords.length;
+            elements.newLearnedCount.textContent = state.newWordsPerDay - state.newWords.length;elements.newLearnedCount.textContent = state.newWordsPerDay - state.newWords.length;
+            elements.reviewedCount.textContent = state.reviewWordsPerDay - state.reviewWords.length;elements.reviewedCount.textContent = state.reviewWordsPerDay - state.reviewWords.length;
             
-            elements.learningScreen.classList.add('hidden');
-            elements.completionScreen.classList.remove('hidden');
-        }
+            elements.learningScreen.classList.add('隐藏');elements.learningScreen.classList.add('hidden');
+            elements.completionScreen.classList.remove('hidden');elements.completionScreen.classList.remove('hidden');
+        }}
 
-        // 保存进度
-        function saveProgress() {
-            const progress = {
-                learnedWords: state.learnedWords,
-                lastLearnedDate: new Date().toISOString()
-            };
-            localStorage.setItem('learningProgress', JSON.stringify(progress));
-        }
+        // 保存进度// 保存进度
+        function saveProgress() {function saveProgress() {
+            const progress = {const progress = {
+                已学习词汇: state.learnedWords,learnedWords: state.learnedWords,
+                lastLearnedDate: new Date().toISOString()lastLearnedDate: new Date().toISOString()
+            };};
+            localStorage.setItem('learningProgress', JSON.stringify(progress));localStorage.setItem('learningProgress', JSON.stringify(progress));
+        }}
 
-        // 重新开始
-        function restartLearning() {
-            elements.completionScreen.classList.add('hidden');
-            elements.welcomeScreen.classList.remove('hidden');
-        }
+        // 重新开始// 重新开始
+        function restartLearning() {function restartLearning() {
+            elements.completionScreen.classList.add('hidden');elements.completionScreen.classList.add('hidden');
+            elements.welcomeScreen.classList.remove('hidden');elements.welcomeScreen.classList.remove('hidden');
+        }}
 
-        // 打乱数组顺序
-        function shuffleArray(array) {
-            const newArray = [...array];
-            for(let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
-        }
+        // 打乱数组顺序// 打乱数组顺序
+        函数 shuffleArray(array) {function shuffleArray(array) {
+            const newArray = [...array];const newArray = [...array];
+            for(let i = newArray.length - 1; i > 0; i--) {for(let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];[newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }}
+            返回 newArray;return newArray;
+        }}
 
-        // 初始化应用
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
-</body>
-</html>
+        // 初始化应用// 初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);document.addEventListener('DOMContentLoaded', initApp);
+    </脚本>
+</主体>
+        </html>
