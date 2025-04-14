@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>英语单词学习</title>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>英语单词学习</title>
     <style>
         * {
             box-sizing: border-box;
@@ -84,12 +91,6 @@
         button:hover {
             background-color: #3a5a8f;
         }
-        .correct {
-            background-color: #2ecc71;
-        }
-        .incorrect {
-            background-color: #e74c3c;
-        }
         .progress-container {
             margin: 15px 0;
             background-color: #ecf0f1;
@@ -115,19 +116,20 @@
         }
         .dictation-input {
             width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
+            padding: 10px;
+            font-size: 1rem;
             text-align: center;
-            margin: 12px 0;
-            border-radius: 10px;
+            margin: 12px 0 8px;
+            border-radius: 8px;
             border: 2px solid #ddd;
+            height: 42px;
             -webkit-appearance: none;
         }
         .dictation-result {
-            font-size: 1.1rem;
+            font-size: 1rem;
             text-align: center;
-            margin: 12px 0;
-            min-height: 30px;
+            margin: 8px 0;
+            min-height: 24px;
         }
         .mode-selector {
             display: grid;
@@ -191,11 +193,11 @@
             font-size: 0.95rem;
         }
         .voice-input-container {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .voice-input-btn {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background-color: #4a6ea9;
             transition: all 0.2s;
             font-size: 1rem;
@@ -223,32 +225,32 @@
             100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
         }
         .voice-input-status {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #7f8c8d;
             text-align: center;
-            margin-top: 5px;
-            min-height: 20px;
+            margin-top: 4px;
+            min-height: 18px;
         }
         .voice-input-hint {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #7f8c8d;
             text-align: center;
-            margin-top: 5px;
+            margin: 4px 0 12px;
         }
         .permission-error {
             color: #e74c3c;
             text-align: center;
             margin: 10px 0;
-            font-size: 0.9rem;
-            padding: 10px;
+            font-size: 0.85rem;
+            padding: 8px;
             background-color: #fde8e8;
             border-radius: 8px;
         }
         .mobile-tip {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #7f8c8d;
             text-align: center;
-            margin: 5px 0 15px;
+            margin: 4px 0 12px;
         }
         .apk-warning {
             background-color: #fff3cd;
@@ -257,7 +259,7 @@
             border-radius: 8px;
             margin: 10px 0;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .apk-solution {
             background-color: #d4edda;
@@ -265,7 +267,7 @@
             padding: 10px;
             border-radius: 8px;
             margin: 10px 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .next-group-btn {
             background-color: #9b59b6;
@@ -304,14 +306,21 @@
         .word-exists-notice {
             color: #e74c3c;
             margin-top: 5px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .word-added-notice {
             color: #2ecc71;
             margin-top: 5px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
     </style>
+</head>
+<body>
+    <!-- HTML内容与之前提供的完全相同，保持结构不变 -->
+    <!-- JavaScript内容与之前提供的完全相同，保持功能不变 -->
+</body>
+</html>
+
 </head>
 <body>
     <div class="container">
